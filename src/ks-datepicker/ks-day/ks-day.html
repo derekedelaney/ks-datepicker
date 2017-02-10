@@ -1,0 +1,39 @@
+<div>
+    <label>
+        <input type="radio" ng-model="ksDay.mode" value="range">
+        date range
+    </label>
+    <label>
+        <input type="radio" ng-model="ksDay.mode" value="multi-select">
+        blackout dates
+    </label>
+</div>
+<div class="flex-container">
+    <button class="flex-item" ng-click="ksDay.move(-1)">&lt;</button>
+
+    <table class="flex-item" ng-repeat="month in ksDay.months track by $index">
+        <thead>
+        <tr>
+            <th class="ks-day-title" colspan="7">{{month.title}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td class="ks-day-weeks" ng-repeat="dayName in ksDay.DAY_NAMES">{{dayName}}</td>
+        </tr>
+        <tr ng-repeat="week in month.weeks track by $index" role="row">
+            <td ng-repeat="day in week" role="gridcell"
+                id="{{day.uid}}">
+                <button type="button"
+                        ng-class="day.customClass"
+                        ng-click="ksDay.select(day)"
+                        ng-disabled="day.disabled">
+                    {{day.label}}
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button class="flex-item" ng-click="ksDay.move(1)">&gt;</button>
+</div>
