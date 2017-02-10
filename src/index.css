@@ -14,7 +14,7 @@
     margin: 10px;
 }
 
-ks-datepicker input, ks-datepicker button, ks-datepicker submit {
+ks-datepicker button, ks-datepicker submit {
     border: none;
     padding: 5px;
     margin: 1px;

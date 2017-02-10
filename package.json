@@ -2,7 +2,7 @@
   "name": "ks-datepicker",
   "version": "0.0.1",
   "description": "Angular datepicker component",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "karma start karma.conf.js --single-run"
   },

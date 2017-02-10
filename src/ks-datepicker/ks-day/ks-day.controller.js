@@ -42,10 +42,10 @@
         ksDay.selectRange = selectRange;
         ksDay.isDateSecondary = isDateSecondary;
         ksDay.$onChanges = init;
+        ksDay.selectAllDays = selectAllDays;
 
 
         function init(changesObject) {
-            console.log(changesObject);
             if (changesObject.hasOwnProperty('dayOptions')) {
                 if (ksDay.days && ksDay.days.length > 0) {
                     ksDay.startDate = ksDay.days[0];
@@ -57,7 +57,6 @@
                 setupDayOptions(changesObject.dayOptions.currentValue);
                 ksDay.months = getMonthsFromNumber(changesObject.dayOptions.currentValue.numOfMonths);
             }
-            console.log(ksDay.dayOptions.numOfMonths);
         }
 
         function setupDayOptions(dayOptions) {
@@ -330,6 +329,11 @@
                 }
                 rangeFirstClick = !rangeFirstClick;
             }
+        }
+
+        function selectAllDays(i, month) {
+            console.log(i);
+            console.log(month);
         }
     }
 })();
