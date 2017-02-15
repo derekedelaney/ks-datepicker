@@ -56,7 +56,7 @@
         function createDateObject(date, month) {
             var day = {
                 date: date,
-                label: date.getDate(date),
+                label: date.getDate(),
                 selected: ksDay.isDateSelected(date),
                 secondary: ksDay.isDateSecondary(date),
                 disabled: !ksDay.isDateInCurrentMonth(date, month),

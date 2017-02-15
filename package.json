@@ -4,6 +4,7 @@
   "description": "Angular datepicker component",
   "main": "main.js",
   "scripts": {
+    "build-prod": "gulp build --production",
     "test": "karma start karma.conf.js --single-run"
   },
   "repository": {
@@ -24,7 +25,13 @@
   },
   "homepage": "https://github.com/derekedelaney/ks-datepicker#readme",
   "devDependencies": {
+    "del": "2.2.2",
     "gulp": "3.9.1",
-    "gulp-cli": "1.2.2"
+    "gulp-cli": "1.2.2",
+    "gulp-concat": "2.6.1",
+    "gulp-ng-annotate": "2.0.0",
+    "gulp-rename": "1.2.2",
+    "gulp-sourcemaps": "2.4.1",
+    "gulp-uglify": "2.0.1"
   }
 }
