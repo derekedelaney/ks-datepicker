@@ -205,6 +205,7 @@
                     ksDay.secondarySelect(dateObject);
                     break;
                 case 'multi-select':
+                    rangeFirstClick = true;
                     ksDay.multiSelect(dateObject);
                     break;
             }
