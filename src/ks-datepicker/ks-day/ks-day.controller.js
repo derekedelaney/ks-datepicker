@@ -14,16 +14,17 @@
         ksDay.step = {months: 1};
         ksDay.startingDay = ($locale.DATETIME_FORMATS.FIRSTDAYOFWEEK + 8) % 7;
         ksDay.DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        ksDay.mode = 'range';
         ksDay.viewedMonths = {};
+        ksDay.dateOptions = {};
+        ksDay.modeOptions = [];
 
         var MONTH_NAMES = $locale.DATETIME_FORMATS.MONTH;
         var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         var rangeFirstClick = true;
 
 
-        // ksDay.init = init;
-        ksDay.setupDayOptions = setupDayOptions;
+        ksDay.init = init;
+        ksDay.setupOptions = setupOptions;
         ksDay.getMonthsFromNumber = getMonthsFromNumber;
         ksDay.createMonthObject = createMonthObject;
         ksDay.getWeeks = getWeeks;
@@ -41,31 +42,42 @@
         ksDay.resetCalender = resetCalender;
         ksDay.selectRange = selectRange;
         ksDay.isDateSecondary = isDateSecondary;
-        ksDay.$onChanges = init;
-        ksDay.selectAllDays = selectAllDays;
+        ksDay.secondarySelect = secondarySelect;
+        ksDay.multiSelect = multiSelect;
 
 
-        function init(changesObject) {
-            if (changesObject.hasOwnProperty('dayOptions')) {
-                if (ksDay.days && ksDay.days.length > 0) {
-                    ksDay.startDate = ksDay.days[0];
-                } else {
-                    ksDay.days = [];
-                    var now = new Date();
-                    ksDay.startDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0);
-                }
-                setupDayOptions(changesObject.dayOptions.currentValue);
-                ksDay.months = getMonthsFromNumber(changesObject.dayOptions.currentValue.numOfMonths);
+        function init() {
+            setupOptions();
+            if (ksDay.days && ksDay.days.length > 0) {
+                ksDay.startDate = ksDay.days[0];
+            } else {
+                var now = new Date();
+                ksDay.startDate = new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0);
+                ksDay.days = [];
             }
+            ksDay.secondaryDays = [];
+            ksDay.months = getMonthsFromNumber(ksDay.dayOptions.numOfMonths);
         }
+        init();
 
-        function setupDayOptions(dayOptions) {
+        function setupOptions() {
             [
-                'numOfMonths'
+                'numOfMonths',
+                'modeOptions',
             ].forEach(function (key) {
                 switch (key) {
                     case 'numOfMonths':
-                        ksDay.dayOptions[key] = dayOptions.hasOwnProperty(key) ? dayOptions[key] : 1;
+                        ksDay.dayOptions[key] = ksDay.dayOptions[key] || 1;
+                        break;
+                    case 'modeOptions':
+                        ksDay.modeOptions = ksDay.dayOptions[key] || ['range'];
+                        for(var i = 0; i < ksDay.modeOptions; i++) {
+                            var mode = ksDay.modeOptions[i];
+                            if(mode !== 'multi-select' || mode !== 'secondary' || mode !== 'range'){
+                                ksDay.modeOptions.splice(i, 1);
+                            }
+                        }
+                        ksDay.mode = ksDay.modeOptions[0];
                         break;
                 }
             });
@@ -83,14 +95,14 @@
                 firstDate.setDate(-numDisplayedFromPreviousMonth + 1);
             }
 
-            for (var num = 0; num < ksDay.dayOptions.numOfMonths; num++) {
+            for (var num = 0; num < ksDay.dayOptions.numOfMonths; num++){
 
             }
 
             var days = ksDay.getDates(firstDate, (NUM_OF_WEEKS * 7));
             for (var i = 0; i < (NUM_OF_WEEKS * 7); i++) {
                 days[i] = angular.extend(ksDay.createDateObject(days[i], firstDayOfMonth.getMonth()), {
-                    uid: ksDay.uniqueId() + '-' + i
+                    uid: ksDay.uniqueId(days[i])
                 });
             }
             var weeks = ksDay.split(days, 7);
@@ -98,18 +110,12 @@
             return weeks;
         }
 
-        /**********************************
-         *
-         * Helper functions
-         *
-         **********************************/
-
         function getMonthsFromNumber(n) {
             var months = new Array(n);
             var startMonth = ksDay.startDate.getMonth();
 
-            for (var i = 0; i < months.length; i++) {
-                months[i] = (ksDay.createMonthObject(startMonth + i));
+            for (var i = 0; i < months.length; i++){
+                months[i] = (ksDay.createMonthObject(startMonth+i));
             }
 
             return months;
@@ -155,8 +161,8 @@
             return day;
         }
 
-        function uniqueId() {
-            return 'datepicker-day-' + Math.floor(Math.random() * 10000)
+        function uniqueId(date) {
+            return date.getTime();
         }
 
         // Split array into smaller arrays
@@ -190,21 +196,19 @@
         }
 
         function select(dateObject) {
-            if (ksDay.mode === 'range') {
-                selectRange(dateObject);
-            } else {
-                if (dateObject.selected) {
-                    dateObject.customClass = 'ks-blackout-date';
-                    dateObject.selected = !dateObject.selected;
-                    dateObject.secondary = !dateObject.secondary;
-                    ksDay.days.splice(getObjectIndexOf(ksDay.days, dateObject, 'uid'), 1);
-                } else if (dateObject.secondary) {
-                    dateObject.customClass = 'ks-selected-date';
-                    dateObject.selected = !dateObject.selected;
-                    dateObject.secondary = !dateObject.secondary;
-                    ksDay.days.push(dateObject);
-                }
+            switch (ksDay.mode){
+                case 'range':
+                    ksDay.selectRange(dateObject);
+                    break;
+                case 'secondary':
+                    rangeFirstClick = true;
+                    ksDay.secondarySelect(dateObject);
+                    break;
+                case 'multi-select':
+                    ksDay.multiSelect(dateObject);
+                    break;
             }
+            ksDay.selectedDays({selected: ksDay.days, secondary: ksDay.secondaryDays});
         }
 
         function getClassName(date, month) {
@@ -212,27 +216,16 @@
                 if (isDateSelected(date)) {
                     return 'ks-selected-date';
                 }
-                if (isDateInRange(date)) {
-                    return 'ks-blackout-date';
+                if (isDateSecondary(date)){
+                    return 'ks-secondary-date';
                 }
             } else {
                 return null;
             }
         }
 
-        function isDateInRange(date) {
-            var isInRange = false;
-            if (ksDay.days.length > 1) {
-                var startDate = ksDay.days[0].date;
-                var endDate = ksDay.days[ksDay.days.length - 1].date;
-                isInRange = (date.getTime() > startDate.getTime() && date.getTime() < endDate.getTime());
-            }
-
-            return isInRange;
-        }
-
         function isDateSecondary(date) {
-            return isDateInRange(date) && !isDateSelected(date);
+            return (getObjectIndexOf(ksDay.secondaryDays, {uid: date.getTime()}, 'uid') > -1) && !isDateSelected(date);
         }
 
         function isDateSelected(date) {
@@ -255,11 +248,13 @@
 
         function resetCalender() {
             ksDay.days = [];
+            ksDay.secondaryDays = [];
             angular.forEach(ksDay.months, function (month) {
                 angular.forEach(month.weeks, function (week) {
                     angular.forEach(week, function (day) {
                         day.customClass = null;
                         day.selected = false;
+                        day.secondary = false;
                     });
                 });
             });
@@ -282,45 +277,36 @@
                 ksDay.days.push(dateObject);
                 rangeFirstClick = !rangeFirstClick;
             } else {
-                var isInRange = false;
                 if (dateObject.date.getTime() > ksDay.days[0].date.getTime()) { // if second selected date is after first date
                     Object.keys(ksDay.viewedMonths).sort(sortMonths).forEach(function (key) {
                         var month = ksDay.viewedMonths[key];
                         angular.forEach(month, function (week) {
                             angular.forEach(week, function (day) {
-                                if (day.date.getTime() === ksDay.days[0].date.getTime()) {
-                                    isInRange = true;
-                                }
-                                if (isInRange && !day.disabled) {
-                                    day.customClass = 'ks-selected-date';
-                                    day.selected = true;
-                                    ksDay.pushDistinctObject(ksDay.days, day, 'uid');
-                                }
-                                if (day.date.getTime() === dateObject.date.getTime()) {
-                                    isInRange = false;
+                                if (day.date.getTime() >= ksDay.days[0].date.getTime() && day.date.getTime() <= dateObject.date.getTime()) {
+                                    if (!day.disabled) {
+                                        day.customClass = 'ks-selected-date';
+                                        day.selected = true;
+                                        ksDay.pushDistinctObject(ksDay.days, day, 'uid');
+                                    }
                                 }
                             });
                         });
                     });
                 } else {
                     var viewedMonthSorted = Object.keys(ksDay.viewedMonths).sort(sortMonths);
-                    for (var i = viewedMonthSorted.length - 1; i >= 0; i--) {
+                    for (var i = viewedMonthSorted.length-1; i >= 0; i--) {
                         var key = viewedMonthSorted[i];
                         var month = ksDay.viewedMonths[key];
-                        for (var j = month.length - 1; j >= 0; j--) {
+                        for (var j = month.length-1; j >= 0; j--) {
                             var week = month[j];
-                            for (var k = week.length - 1; k >= 0; k--) {
+                            for (var k = week.length-1; k >= 0; k--) {
                                 var day = week[k];
-                                if (day.date.getTime() === ksDay.days[0].date.getTime()) {
-                                    isInRange = true;
-                                }
-                                if (isInRange && !day.disabled) {
-                                    day.customClass = 'ks-selected-date';
-                                    day.selected = true;
-                                    ksDay.pushDistinctObject(ksDay.days, day, 'uid');
-                                }
-                                if (day.date.getTime() === dateObject.date.getTime()) {
-                                    isInRange = false;
+                                if (day.date.getTime() <= ksDay.days[0].date.getTime() && day.date.getTime() >= dateObject.date.getTime()) {
+                                    if (!day.disabled) {
+                                        day.customClass = 'ks-selected-date';
+                                        day.selected = true;
+                                        ksDay.pushDistinctObject(ksDay.days, day, 'uid');
+                                    }
                                 }
                             }
                         }
@@ -331,9 +317,38 @@
             }
         }
 
-        function selectAllDays(i, month) {
-            console.log(i);
-            console.log(month);
+        function secondarySelect(dateObject) {
+            if (dateObject.selected) {
+                dateObject.customClass = 'ks-secondary-date';
+                dateObject.selected = !dateObject.selected;
+                dateObject.secondary = !dateObject.secondary;
+                ksDay.days.splice(getObjectIndexOf(ksDay.days, dateObject, 'uid'), 1);
+                ksDay.secondaryDays.push(dateObject);
+            } else if (dateObject.secondary) {
+                dateObject.customClass = 'ks-selected-date';
+                dateObject.selected = !dateObject.selected;
+                dateObject.secondary = !dateObject.secondary;
+                ksDay.days.push(dateObject);
+                ksDay.secondaryDays.splice(getObjectIndexOf(ksDay.secondaryDays, dateObject, 'uid'), 1);
+            }
+        }
+
+        function multiSelect(dateObject) {
+            if (dateObject.selected) {
+                dateObject.customClass = null;
+                dateObject.selected = !dateObject.selected;
+                ksDay.days.splice(getObjectIndexOf(ksDay.days, dateObject, 'uid'), 1);
+            } else if (dateObject.secondary) {
+                dateObject.customClass = 'ks-selected-date';
+                dateObject.selected = !dateObject.selected;
+                dateObject.secondary = !dateObject.secondary;
+                ksDay.days.push(dateObject);
+                ksDay.secondaryDays.splice(getObjectIndexOf(ksDay.secondaryDays, dateObject, 'uid'), 1);
+            } else {
+                dateObject.customClass = 'ks-selected-date';
+                dateObject.selected = !dateObject.selected;
+                ksDay.days.push(dateObject);
+            }
         }
     }
 })();

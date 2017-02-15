@@ -1,9 +1,10 @@
 <!doctype html>
 <html ng-app="ks-datepicker">
 <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="index.css">
 
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
 
     <script src="index.js"></script>
     <script src="demo.controller.js"></script>
@@ -16,7 +17,8 @@
 <body>
 <h2>KS-Datepicker</h2>
 <div ng-controller="DemoController as demo">
-    <ks-datepicker></ks-datepicker>
+    <ks-datepicker selected-dates="demoDate.selectedDates($value)"></ks-datepicker>
+    <div>{{demoDate.dates}}</div>
 </div>
 </body>
 </html>

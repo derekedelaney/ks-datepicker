@@ -1,15 +1,13 @@
 <div>
-    <label>
-        <input type="radio" ng-model="ksDay.mode" value="range">
-        Date range
-    </label>
-    <label>
-        <input type="radio" ng-model="ksDay.mode" value="multi-select">
-        Blackout dates
-    </label>
+    <h3 class="inline">{{ksDay.dayOptions.tableHeader}}</h3>
+    <span ng-if="ksDay.modeOptions.length > 1" ng-repeat="mode in ksDay.modeOptions">
+        <input id="ks-rb-{{mode}}" type="radio" ng-model="ksDay.mode" value={{mode}}>
+        <label for="ks-rb-{{mode}}" class="ks-label-{{mode}}"> {{mode}} </label>
+    </span>
+
 </div>
 <div class="flex-container">
-    <button class="flex-item" ng-click="ksDay.move(-1)">&lt;</button>
+    <button class="flex-item ks-arrow-button" ng-click="ksDay.move(-1)"><span class="glyphicon glyphicon-menu-left"></span></button>
 
     <table class="flex-item" ng-repeat="month in ksDay.months track by $index">
         <thead>
@@ -25,6 +23,7 @@
             <td ng-repeat="day in week" role="gridcell"
                 id="{{day.uid}}">
                 <button type="button"
+                        data-test="{{day.uid}}"
                         ng-class="day.customClass"
                         ng-click="ksDay.select(day)"
                         ng-disabled="day.disabled">
@@ -35,5 +34,5 @@
         </tbody>
     </table>
 
-    <button class="flex-item" ng-click="ksDay.move(1)">&gt;</button>
+    <button class="flex-item ks-arrow-button" ng-click="ksDay.move(1)"><span class="glyphicon glyphicon-menu-right"></span></button>
 </div>

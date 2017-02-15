@@ -16,9 +16,9 @@
 
 ks-datepicker button, ks-datepicker submit {
     border: none;
-    padding: 5px;
+    padding: 10px;
     margin: 1px;
-    width: 30px;
+    width: 40px;
     text-align: center;
     background-color: #e3e3e3;
 }
@@ -39,10 +39,42 @@ ks-datepicker .ks-day-title {
     text-align: center;
 }
 
-ks-datepicker button.ks-selected-date {
+ks-datepicker .ks-arrow-button {
+    margin-top: 135px;
+    height: 40px;
+    border-radius: 100%;
+}
+
+ks-datepicker .ks-selected-date {
+    background-color: #147FC2;
+    color: #fff;
+}
+
+ks-datepicker .ks-secondary-date {
+    background-color: #FF0000;
+    color: #fff;
+    transition: background-color 0.2s ease-in;
+}
+
+ks-datepicker label {
+    color: #fff;
+    font-weight: 400;
+    padding: 1px 10px;
+    border-radius: 2px;
+}
+
+ks-datepicker label.ks-label-range {
     background-color: #147FC2;
 }
 
-ks-datepicker button.ks-blackout-date {
+ks-datepicker label.ks-label-secondary {
     background-color: #FF0000;
+}
+
+ks-datepicker label.ks-label-multi-select {
+    background-color: #777777;
+}
+
+ks-datepicker input[type=radio] {
+    margin-left: 10px;
 }
