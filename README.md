@@ -6,7 +6,7 @@ Angular datepicker component.
 2. open the `demo.html` file.
 
 ##### ToDos
--[ ] npm and bower modules
--[ ] Date Options
--[ ] Month View
--[ ] Year View
+- [ ] npm and bower modules
+- [ ] Date Options
+- [ ] Month View
+- [ ] Year View
