@@ -20,7 +20,7 @@
 
             }
 
-            ksDatepicker.dayOptions = {numOfMonths: 3, modeOptions: ['range', 'secondary', 'multi-select'], tableHeader: 'Travel Dates'};
+            ksDatepicker.dayOptions = {numOfMonths: 3, modeOptions: ['range', 'secondary', 'multi-select'], tableHeader: 'Table Header'};
         }
         init();
 
