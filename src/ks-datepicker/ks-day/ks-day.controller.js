@@ -44,7 +44,7 @@
         ksDay.uniqueId = uniqueId;
         ksDay.weekCount = weekCount;
 
-        init();
+        ksDay.init();
 
         /**
          * @name createDateObject
@@ -54,7 +54,7 @@
          * @returns {{date: *, label: (*|number|string), selected: *, secondary: *, disabled: boolean, customClass: *}}
          */
         function createDateObject(date, month) {
-            var day = {
+            return {
                 date: date,
                 label: date.getDate(),
                 selected: ksDay.isDateSelected(date),
@@ -62,8 +62,6 @@
                 disabled: !ksDay.isDateInCurrentMonth(date, month),
                 customClass: ksDay.getClassName(date, month),
             };
-
-            return day;
         }
 
         /**
@@ -418,12 +416,10 @@
                         break;
                     case 'modeOptions':
                         ksDay.modeOptions = ksDay.dayOptions[key] || ['range'];
-                        for(var i = 0; i < ksDay.modeOptions; i++) {
-                            var mode = ksDay.modeOptions[i];
-                            if(mode !== 'multi-select' || mode !== 'secondary' || mode !== 'range'){
-                                ksDay.modeOptions.splice(i, 1);
-                            }
-                        }
+                        ksDay.dayOptions[key] = ksDay.dayOptions[key] || ['range'];
+                        ksDay.modeOptions = ksDay.modeOptions.filter(function (mode) {
+                            return (mode === 'multi-select' || mode === 'secondary' || mode === 'range');
+                        });
                         ksDay.mode = ksDay.modeOptions[0];
                         break;
                 }
